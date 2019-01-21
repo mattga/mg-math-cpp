@@ -50,6 +50,19 @@
 #define ELOG(message, ...)
 #endif
 
+#ifndef NDEBUG
+#   define ASSERT(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+#else
+#   define ASSERT(condition, message) do { } while (false)
+#endif
+
 namespace mg {
 	template <typename T, int _Rows, int _Cols>
 	struct Eig_hasher { // Pseudo-unique integer hasher
