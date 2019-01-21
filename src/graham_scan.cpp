@@ -16,7 +16,7 @@ mg::VecList2f graham_scan::ConvexHull(const mg::VecList2f &P)
 
 mg::VecList2f graham_scan::convexHull()
 {
-    int sz = P.size();
+    size_t sz = P.size();
     if (sz <= 3)
         return P;
 

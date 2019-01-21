@@ -2,7 +2,7 @@
 #define QUATERNION_BASE_ADDONS_H
 
 #ifndef EIGEN_QUATERNION_PLUGIN
-	#define EIGEN_QUATERNIONBASE_PLUGIN "math/eigen_QuaternionBaseAddons.h"
+	#define EIGEN_QUATERNIONBASE_PLUGIN "eigen_QuaternionBaseAddons.h"
 #endif
 
 #else // QUATERNION_BASE_ADDONS_H

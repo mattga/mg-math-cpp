@@ -8,7 +8,7 @@
 #ifndef polyhedra_mirtich_h
 #define polyhedra_mirtich_h
 
-#include <math/Core.h>
+#include "core.h"
 
 /*
  ============================================================================

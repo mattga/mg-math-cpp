@@ -2,9 +2,11 @@
 
 #include <chrono>
 #include <stdarg.h>
+#ifdef CV_VERSION
 #include <opencv2/core.hpp>
+#endif
 
-#include <math\core.h>
+#include "core.h"
 
 using namespace std::chrono;
 
@@ -19,6 +21,22 @@ namespace mg
         mg::time_point getTimePoint();
 
         double tdiff(mg::time_point t1, mg::time_point t2 = getTimePoint());
+
+        template <typename TK, typename TV = int, typename _Map = unordered_map<TK, TV>>
+        void map_increment(_Map map, TK key)
+        {
+            if (contains(nb_vert_diffs, key))
+                map[key]++;
+            else
+                map[key] = 1;
+        }
+
+        template <typename TK, typename TV = int, typename _Map = unordered_map<TK, TV>>
+        void map_increment(_Map map, std::initializer_list<TK> keys)
+        {
+            for (TK key : keys)
+                map_increment(map, key);
+        }
 
         // Set containment
         template <typename T, typename ST = unordered_set<T>>
@@ -73,6 +91,7 @@ namespace mg
         /**
         * OpenCV <--> Eigen
         **/
+#ifdef CV_VERSION
         Vec2  eig(cv::Point p);
         Vec2  eig(cv::Vec2d p);
         Vec2  eig(cv::Vec2f p);
@@ -81,5 +100,6 @@ namespace mg
 
         template <typename Derived>
         cv::Point ocv(Eigen::MatrixBase<Derived> &p) { return cv::Point(int(p[0]), int(p[1])); }
+#endif
     }
 }

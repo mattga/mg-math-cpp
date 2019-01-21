@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math\Core.h>
+#include "core.h"
 
 class graham_scan
 {

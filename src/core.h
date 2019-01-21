@@ -1,7 +1,7 @@
 #pragma once
 
 // Must include before Eigen\Dense for additional Quaternion functions
-#include "math/eigen_QuaternionBaseAddons.h"
+#include "eigen_QuaternionBaseAddons.h"
 
 #ifdef _WIN32
 #include <Eigen\Dense>

@@ -8,7 +8,7 @@
 #ifndef horns_alg_hpp
 #define horns_alg_hpp
 
-#include "Core.h"
+#include "core.h"
 
 namespace mg
 {

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <math\Core.h>
+#include "core.h"
 
 using namespace mg;
 

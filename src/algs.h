@@ -55,7 +55,7 @@ namespace mg
         double dist(int *v1, int *v2, int n = 3);
 
         // Median function
-        // TODO: Create eigen-supported median function
+        // TODO: eigen-supported median function
         template <typename T>
         T median(std::vector<T> &v)
         {
