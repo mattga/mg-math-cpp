@@ -38,6 +38,7 @@
 
 #if defined(LOG_STDOUT) && defined(LOG_DEBUG)
     #define DLOG(message, ...) printf("[DEBUG] " message, ## __VA_ARGS__)
+    #define DLOG_(message, ...) printf("[DEBUG] " message, ## __VA_ARGS__)
 #else
     #define DLOG(message, ...)
 #endif
@@ -51,11 +52,12 @@
 #endif
 
 #ifndef NDEBUG
-#   define ASSERT(condition, message) \
+#   define ASSERT(condition, message, ...) \
     do { \
         if (! (condition)) { \
             std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
-                      << " line " << __LINE__ << ": " << message << std::endl; \
+                      << " line " << __LINE__ << ": "; \
+            printf(message "\n", ## __VA_ARGS__); \
             std::terminate(); \
         } \
     } while (false)
@@ -63,10 +65,11 @@
 #   define ASSERT(condition, message) do { } while (false)
 #endif
 
-namespace mg {
-	template <typename T, int _Rows, int _Cols>
-	struct Eig_hasher { // Pseudo-unique integer hasher
-		size_t operator()(const Eigen::Matrix<T, _Rows, _Cols>& t) const
+namespace mg
+{
+	template <typename Derived>
+	struct Eig_hash { // Pseudo-unique integer hasher
+		size_t operator()(const Derived& t) const
 		{
 			size_t val = 0;
 			for (int i = 0; i < _Rows; i++) {
@@ -78,9 +81,9 @@ namespace mg {
 		}
 	};
     
-    template <typename T>
-    struct Eig_hasher2X { // Pseudo-unique integer hasher (for int)
-        size_t operator()(const Eigen::Matrix<T, 2, 1>& t) const
+    template <typename Derived>
+    struct Eig_hash2X { // Pseudo-unique integer hasher
+        size_t operator()(const Derived& t) const
         {
             return int(41 * t(0)) ^ int(t(1));
         }
@@ -122,9 +125,9 @@ namespace mg {
 	template<typename T, int N, int M>
 	using Mat = Eigen::Matrix<T, N, M>;
     
-    typedef Eigen::Matrix<double, 2, 2> Matrix2;
-    typedef Eigen::Matrix<double, 3, 3> Matrix3;
-    typedef Eigen::Matrix<double, 4, 4> Matrix4;
+    typedef Eigen::Matrix<double, 2, 2> Mat2;
+    typedef Eigen::Matrix<double, 3, 3> Mat3;
+    typedef Eigen::Matrix<double, 4, 4> Mat4;
     typedef Eigen::Matrix<double, 2, 3> Matrix23;
     typedef Eigen::Matrix<double, 3, 2> Matrix32;
     typedef Eigen::Matrix<double, 3, 4> Matrix34;
@@ -139,14 +142,12 @@ namespace mg {
         using EigList = std::vector<Derived, _alloc>;
 
     template<
-        typename T,
-        int N,
-        int M = 1,
-        typename _hash = Eig_hasher<T, N, M>,
-        typename _equals = std::equal_to<Eigen::Matrix<T, N, M> >,
-        typename _alloc = Eigen::aligned_allocator<Eigen::Matrix<T, N, M> >
+        typename Derived,
+        typename _hash = Eig_hash<Derived>,
+        typename _equals = std::equal_to<Derived >,
+        typename _alloc = Eigen::aligned_allocator<Derived >
     >
-        using EigSet = std::unordered_set<Eigen::Matrix<T, N, M>, _hash, _equals, _alloc >;
+        using EigSet = std::unordered_set<Derived, _hash, _equals, _alloc >;
 
     template<
         typename T,
@@ -161,7 +162,7 @@ namespace mg {
         typename T,
         int N = 2,
         int M = 1,
-        typename _hash = Eig_hasher2X<T>,
+        typename _hash = Eig_hash2X<T>,
         typename _equals = std::equal_to<Eigen::Matrix<T, N, M> >,
         typename _alloc = Eigen::aligned_allocator<Eigen::Matrix<T, N, M> >
     >
@@ -190,17 +191,17 @@ namespace mg {
 	typedef EigMap<int, VecSet2f> VecSetMap2f;
 
 	typedef EigList<Vec3> VecList3f;
-	typedef EigSet<double, 3> VecSet3f;
+	typedef EigSet<Vec3> VecSet3f;
 	typedef EigMap<int, Vec3> VecMap3f;
 	typedef EigMap<int, VecSet3f> VecSetMap3f;
     
     typedef EigList<Vec2i> VecList2i;
-    typedef EigSet2X<int> VecSet2i;
+    typedef EigSet2X<Vec2i> VecSet2i;
     typedef EigMap<int, Vec2i> VecMap2i;
     typedef EigMap<int, VecList2i> VecSetMap2i;
     
     typedef EigList<Vec3i> VecList3i;
-    typedef EigSet<int, 3> VecSet3i;
+    typedef EigSet<Vec3i> VecSet3i;
     typedef EigMap<int, Vec3i> VecMap3i;
     typedef EigMap<int, VecSet3i> VecSetMap3i;
     

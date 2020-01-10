@@ -8,8 +8,8 @@ namespace mg
             return perp(v1).dot(v2);
         }
 
-        Matrix3 crossVec(const Vec3 &v) {
-            Matrix3 res;
+        Mat3 crossVec(const Vec3 &v) {
+            Mat3 res;
             res << 0, -v(2), v(1),
                 v(2), 0, -v(0),
                 -v(1), v(0), 0;

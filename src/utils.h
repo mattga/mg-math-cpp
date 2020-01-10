@@ -22,31 +22,44 @@ namespace mg
 
         double tdiff(mg::time_point t1, mg::time_point t2 = getTimePoint());
 
-        template <typename TK, typename TV = int, typename _Map = unordered_map<TK, TV>>
-        void map_increment(_Map map, TK key)
+        template <typename K, typename V = int, typename _Map = std::unordered_map<K, V>>
+        void map_increment(_Map& map, K key)
         {
-            if (contains(nb_vert_diffs, key))
+            if (contains(map, key))
                 map[key]++;
             else
                 map[key] = 1;
         }
 
-        template <typename TK, typename TV = int, typename _Map = unordered_map<TK, TV>>
-        void map_increment(_Map map, std::initializer_list<TK> keys)
+        template <typename K, typename V = int, typename _Map = std::unordered_map<K, V>>
+        void map_increment(_Map& map, std::initializer_list<K> keys)
         {
-            for (TK key : keys)
+            for (K key : keys)
                 map_increment(map, key);
         }
 
+        template <
+            typename K, 
+            typename V, 
+            typename S = std::unordered_set<V>, 
+            typename _Map = std::unordered_map<K, S> 
+        >
+        void map_collect(_Map& map, const K& key, const V& val)
+        {
+            if (!contains(map, key))
+                map[key] = S();
+            map[key].insert(val);
+        }
+
         // Set containment
-        template <typename T, typename ST = unordered_set<T>>
+        template <typename T, typename ST = std::unordered_set<T>>
         bool contains(ST &S, T val)
         {
             return S.find(val) != S.end();
         }
 
-        template <typename T, typename ST = unordered_set<T>>
-        bool containsAll(ST &S, ST &vals)
+        template <typename T, typename ST = std::unordered_set<T>, typename ST2 = ST>
+        bool containsAll(ST &S, ST2 &vals)
         {
             bool hasVals = !vals.empty();
 
@@ -56,10 +69,10 @@ namespace mg
             return hasVals;
         }
 
-        template <typename T, typename ST = unordered_set<T>>
+        template <typename T, typename ST = std::unordered_set<T>>
         bool containsAll(ST &S, std::initializer_list<T> vals)
         {
-            bool hasVals = !vals.empty();
+            bool hasVals = vals.size() > 0;
 
             for (T val : vals)
                 hasVals &= contains(S, val);
@@ -67,7 +80,7 @@ namespace mg
             return hasVals;
         }
 
-        template <typename T, typename ST = unordered_set<T>>
+        template <typename T, typename ST = std::unordered_set<T>>
         bool containsAny(ST &S, ST &vals)
         {
             bool hasVal = vals.empty();
@@ -78,21 +91,74 @@ namespace mg
             return hasVal;
         }
 
-        template <typename T, typename LT = vector<T>>
-        bool equals(LT &L, std::initializer_list<T> vals)
+        template <
+            typename T,
+            typename ST = std::unordered_set<T>,
+            typename ST2 = ST,
+            typename VT = std::vector<T>>
+            VT set_diff(ST &S1, ST2 S2)
         {
-            for (int i = 0; i < vals.size(); i++)
-                if (i >= L.size() || L[i] != vals[i])
-                    return false;
+            VT res;
+            std::set<T> OrdS1(S1.begin(), S1.end());
+            std::set<T> OrdS2(S2.begin(), S2.end());
 
-            return true;
+            std::set_difference(
+                OrdS1.begin(), OrdS1.end(),
+                OrdS2.begin(), OrdS2.end(),
+                std::inserter(res, res.begin()));
+
+            return res;
         }
+
+        template <typename T, typename ST1 = std::vector<T>, typename ST2 = ST1>
+        bool equals(ST1 &S1, ST2 S2)
+        {
+            if (S1.size() != S2.size())
+                return false;
+
+            return std::equal(S1.begin(), S1.end(), S2.begin(), S2.end());
+        }
+
+        template <typename T, typename ST1 = std::set<T>, typename ST2 = ST1>
+        bool set_equals(ST1 &S1, ST2 S2)
+        {
+            if (S1.size() != S2.size())
+                return false;
+
+            return set_diff<T>(S1, S2).empty();
+        }
+
+        template <typename T>
+        std::pair<T, T> make_ord_pair(T &val1, T &val2)
+        {
+            return make_pair(val1 < val2 ? val1 : val2, val1 < val2 ? val2 : val1);
+        }
+
+        template <typename T, typename MT, typename ST = std::unordered_set<T>>
+        ST make_keyset(MT &map)
+        {
+            ST S;
+            for (auto pr : map)
+                S.insert(S.end(), pr.first);
+            return S;
+        }
+
+        template <typename T, typename MT, typename ST = std::unordered_set<T>>
+        ST make_valset(MT &map)
+        {
+            ST S;
+            for (auto pr : map)
+                S.insert(S.end(), pr.second);
+            return S;
+        }
+
 
         /**
         * OpenCV <--> Eigen
         **/
 #ifdef CV_VERSION
         Vec2  eig(cv::Point p);
+        Vec2  eig(cv::Point2f p);
         Vec2  eig(cv::Vec2d p);
         Vec2  eig(cv::Vec2f p);
         Vec3i eig(cv::Vec3b v);

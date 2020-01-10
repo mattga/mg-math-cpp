@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "utils.h"
 
 #include <memory>
@@ -39,9 +40,11 @@ namespace mg
         */
 #ifdef CV_VERSION
         Vec2  eig(cv::Point p) { return Vec2(p.x, p.y); }
+        Vec2  eig(cv::Point2f p) { return Vec2(p.x, p.y); }
         Vec2  eig(cv::Vec2d p) { return Vec2(p(0), p(1)); }
         Vec2  eig(cv::Vec2f p) { return Vec2(p(0), p(1)); }
         Vec3i eig(cv::Vec3b v) { return Vec3i((int)v.val[0], (int)v.val[1], (int)v.val[2]); }
+        Vec3  eig(cv::Vec3f v) { return Vec3((double)v.val[0], (double)v.val[1], (double)v.val[2]); }
         Vec4  eig(cv::Vec4f v) { return Vec4(v.val[0], v.val[1], v.val[2], v.val[3]); }
 #endif
     }

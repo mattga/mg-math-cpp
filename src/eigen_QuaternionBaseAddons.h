@@ -27,4 +27,6 @@ Vector3 rotate(const Vector3 &v) const
 
 Vector3 rotate2(const Vector3 &v) const { return conjugate().rotate(v); }
 
+Vector4d rcoeffs() { return (Vector4d() << w(), vec()).finished(); }
+
 #endif // QUATERNION_BASE_ADDONS_H

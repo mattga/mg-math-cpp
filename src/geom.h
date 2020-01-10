@@ -8,7 +8,7 @@ namespace mg
     {
         double cross2(const Vec2&, const Vec2&);
 
-        Matrix3 crossVec(const Vec3& v);
+        Mat3 crossVec(const Vec3& v);
 
         Vec2 perp(const Vec2 &v);
 

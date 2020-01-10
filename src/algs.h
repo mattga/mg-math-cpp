@@ -88,6 +88,29 @@ namespace mg
 
             return xbar;
         }
+        template<typename Key, typename Derived>
+        Derived mean(const EigMap<Key, Derived> &X, double *W = NULL)
+        {
+            size_t num_obs = X.size();
+            Derived xbar;
+
+            if (num_obs > 0)
+            {
+                xbar = Eigen::MatrixBase<Derived>::Zero(X.begin()->second.rows());
+
+                int i = 0;
+                for (auto pr : X)
+                    if (W != NULL)
+                        xbar += W[i++] * pr.second;
+                    else
+                        xbar += pr.second;
+
+                if (W == NULL)
+                    xbar /= double(num_obs);
+            }
+
+            return xbar;
+        }
 
         template<typename Derived>
         Derived min(const EigList<Derived> &X, int index, int &minIndex)
@@ -174,68 +197,6 @@ namespace mg
             }
 
             return P;
-        }
-
-        // Binning algorithm
-        template <typename T>
-        void bin_avg_insert(T val, std::vector<T> &sums, std::vector<int> &cts,
-            bool(*f_thresh)(T &v1, T &v2),
-            bool bin_multiple = false)
-        {
-            bool added = false;
-
-            for (int i = 0; i < sums.size(); i++)
-            {
-                T bin_avg = sums[i] / cts[i];
-
-                if (f_thresh(val, bin_avg))
-                {
-                    sums[i] += val;
-                    cts[i]++;
-                    added = true;
-                    if (!bin_multiple) break;
-                }
-            }
-
-            if (!added)
-            {
-                sums.push_back(val);
-                cts.push_back(1);
-            }
-        }
-
-        template <typename DT, int _N, int _M = 1,
-            typename T = mg::Mat<DT, _N, _M>,
-            typename LT = mg::EigList<T>
-        >
-            void bin_avg_insert(
-                T val, LT &sums, std::vector<int> &cts,
-                bool(*f_thresh)(T &v1, T &v2),
-                bool bin_multiple = false,
-                std::vector<EigSet<DT, _N, _M>> *vals = NULL)
-        {
-            bool added = false;
-
-            for (int i = 0; i < sums.size(); i++)
-            {
-                T bin_avg = sums[i] / sums[i].size();
-
-                if (f_thresh(val, bin_avg))
-                {
-                    sums[i] += val;
-                    cts[i]++;
-                    if (vals != NULL) vals->at(i).
-                        added = true;
-                    if (!bin_multiple) break;
-                }
-            }
-
-            if (!added)
-            {
-                sums.push_back(val);
-                cts.push_back(1);
-                if (vals != NULL) vals->push_back(EigSet<DT, _N, _M>({ val }));
-            }
         }
     }
 }

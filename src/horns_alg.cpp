@@ -19,18 +19,18 @@ namespace mg
         Vec3 pbar = mean(P);
         Vec3 qbar = mean(Q);
         
-        Matrix4 M = Matrix4::Zero();
+        Mat4 M = Mat4::Zero();
         for (int i = 0; i < P.size(); i++)
         {
             Vec3 pi = P[i] - pbar, qi = Q[i] - qbar;
             
-            Matrix4 Pi;
+            Mat4 Pi;
             Pi << 0, -pi(0), -pi(1), -pi(2),
                 pi(0), 0, pi(2), -pi(1),
                 pi(1), -pi(2), 0, pi(0),
                 pi(2), pi(1), -pi(0), 0;
             
-            Matrix4 Qi;
+            Mat4 Qi;
             Qi << 0, -qi(0), -qi(1), -qi(2),
                 qi(0), 0, -qi(2), qi(1),
                 qi(1), qi(2), 0, -qi(0),
@@ -39,7 +39,7 @@ namespace mg
             M += Pi.transpose() * Qi;
         }
         
-        Eigen::EigenSolver<Matrix4> es(M);
+        Eigen::EigenSolver<Mat4> es(M);
         if (es.info() != Eigen::Success)
             return 0 - (int)es.info();
         
